@@ -20,12 +20,14 @@
     "react-pdf"
   ],
   "scripts": {
-    "build": "lerna run build",
-    "watch": "lerna run watch --parallel",
-    "test": "lerna run test",
-    "lint": "lerna run lint",
-    "clean": "lerna clean --yes && rimraf node_modules",
-    "release": "lerna publish"
+    "build": "pnpm -r build",
+    "watch": "pnpm -r --parallel watch",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r clean && rimraf node_modules",
+    "release": "pnpm publish -r",
+    "publish-check": "node publish.js",
+    "publish-all": "node publish.js --publish"
   },
   "devDependencies": {
     "lerna": "^7.4.2",
@@ -34,6 +36,7 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
+      "esbuild",
       "nx"
     ]
   }

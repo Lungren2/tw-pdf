@@ -1,6 +1,6 @@
 {
   "name": "tw-pdf",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "description": "A fork of react-pdf with Tailwind CSS integration",
   "author": "Ethan Ogle <ethan@easygames.co.za>",
@@ -10,7 +10,7 @@
   "types": "./lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Lungren2/tw-pdf.git"
+    "url": "git+https://github.com/Lungren2/tw-pdf.git"
   },
   "keywords": [
     "react",
@@ -23,7 +23,10 @@
     "test": "vitest",
     "build": "rimraf ./lib && rollup -c",
     "watch": "rimraf ./lib && rollup -c -w",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run verify-package",
+    "verify-package": "npm run build && npm pack --dry-run",
+    "release": "npm run verify-package && npm publish"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.0",
@@ -43,7 +46,7 @@
     "rollup-plugin-dts": "^6.1.0",
     "rollup-plugin-local-resolve": "^1.0.7",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.1"
+    "vitest": "^3.1.1"
   },
   "files": [
     "lib"

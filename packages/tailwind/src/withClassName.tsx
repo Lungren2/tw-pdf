@@ -1,27 +1,29 @@
-import React, { ComponentType, forwardRef, useEffect, useState } from 'react';
-import { Style } from '@react-pdf/stylesheet';
-import { tw } from './index';
+import React, { ComponentType, forwardRef, useEffect, useState } from "react"
+import { Style } from "@react-pdf/stylesheet"
+import { tw } from "./tw"
 
 // Props that will be added to components
 export interface ClassNameProps {
-  className?: string;
-  style?: Style | Style[];
+  className?: string
+  style?: Style | Style[]
 }
 
 /**
  * Higher-order component that adds className support to react-pdf components
- * 
+ *
  * @param Component - The react-pdf component to enhance
  * @returns A new component with className support
  */
 export const withClassName = <P extends object>(
-  Component: ComponentType<P & { style?: Style | Style[] }>
+  Component: ComponentType<P>
 ) => {
   // Create a new component with className support
   const WithClassName = forwardRef<unknown, P & ClassNameProps>(
     ({ className, style, ...props }, ref) => {
-      const [processedStyle, setProcessedStyle] = useState<Style | Style[] | undefined>(style);
-      
+      const [processedStyle, setProcessedStyle] = useState<
+        Style | Style[] | undefined
+      >(style)
+
       useEffect(() => {
         if (className) {
           // Process Tailwind classes
@@ -29,29 +31,29 @@ export const withClassName = <P extends object>(
             if (style) {
               // Merge with any provided style prop (style prop takes precedence)
               if (Array.isArray(style)) {
-                setProcessedStyle([tailwindStyle, ...style]);
+                setProcessedStyle([tailwindStyle, ...style])
               } else {
-                setProcessedStyle([tailwindStyle, style]);
+                setProcessedStyle([tailwindStyle, style])
               }
             } else {
-              setProcessedStyle(tailwindStyle);
+              setProcessedStyle(tailwindStyle)
             }
-          });
+          })
         } else {
-          setProcessedStyle(style);
+          setProcessedStyle(style)
         }
-      }, [className, style]);
-      
-      // @ts-ignore - Spread props may not be valid
-      return <Component ref={ref} {...props} style={processedStyle} />;
-    }
-  );
-  
-  // Set display name for debugging
-  const componentName = Component.displayName || Component.name || 'Component';
-  WithClassName.displayName = `withClassName(${componentName})`;
-  
-  return WithClassName;
-};
+      }, [className, style])
 
-export default withClassName;
+      // @ts-ignore - Spread props may not be valid
+      return <Component ref={ref} {...props} style={processedStyle} />
+    }
+  )
+
+  // Set display name for debugging
+  const componentName = Component.displayName || Component.name || "Component"
+  WithClassName.displayName = `withClassName(${componentName})`
+
+  return WithClassName
+}
+
+export default withClassName

@@ -13,9 +13,9 @@ const config = {
 };
 
 const dtsConfig = {
-  input: './lib/types/index.d.ts',
+  input: 'src/index.ts',
   output: [{ file: 'lib/index.d.ts', format: 'es' }],
-  plugins: [dts(), del({ targets: 'lib/types', hook: 'buildEnd' })],
+  plugins: [dts()],
 };
 
 export default [config, dtsConfig];

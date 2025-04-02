@@ -1,0 +1,34 @@
+{
+  "name": "tw-pdf",
+  "version": "0.1.0",
+  "description": "A fork of react-pdf with Tailwind CSS integration",
+  "author": "Ethan Ogle <ethanogle012@outlook.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lungren2/tw-pdf.git"
+  },
+  "homepage": "https://github.com/Lungren2/tw-pdf#readme",
+  "bugs": {
+    "url": "https://github.com/Lungren2/tw-pdf/issues"
+  },
+  "keywords": [
+    "react",
+    "pdf",
+    "tailwind",
+    "tailwindcss",
+    "react-pdf"
+  ],
+  "scripts": {
+    "build": "lerna run build",
+    "watch": "lerna run watch --parallel",
+    "test": "lerna run test",
+    "lint": "lerna run lint",
+    "clean": "lerna clean --yes && rimraf node_modules",
+    "release": "lerna publish"
+  },
+  "devDependencies": {
+    "lerna": "^7.4.2",
+    "rimraf": "^5.0.5"
+  }
+}

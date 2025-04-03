@@ -15,6 +15,7 @@
 const { execSync } = require("child_process")
 const fs = require("fs")
 const path = require("path")
+const { tryCatch } = require("@maxmorozoff/try-catch-tuple")
 
 // Configuration
 const config = {
@@ -29,16 +30,18 @@ const error = (message) => console.error(`\n\x1b[31mERROR: ${message}\x1b[0m`)
 const success = (message) => console.log(`\n\x1b[32m${message}\x1b[0m`)
 
 const exec = (command, options = {}) => {
-  try {
-    log(`Executing: ${command}`)
-    return execSync(command, {
+  log(`Executing: ${command}`)
+  const [result, err] = tryCatch(() =>
+    execSync(command, {
       stdio: "inherit",
       ...options,
     })
-  } catch (err) {
+  )
+  if (err) {
     error(`Command failed: ${command}`)
     throw err
   }
+  return result
 }
 
 // Create temp directory if it doesn't exist
@@ -48,7 +51,7 @@ if (!fs.existsSync(config.tempDir)) {
 
 // Main process
 async function main() {
-  try {
+  const [_, err] = await tryCatch(async () => {
     // Step 1: Install dependencies
     log("Installing dependencies...")
     exec("pnpm install")
@@ -61,15 +64,32 @@ async function main() {
     log("Running tests...")
     exec("pnpm test")
 
+    // Validate packages directory
+    if (!fs.existsSync(config.packagesDir)) {
+      error(`Packages directory not found: ${config.packagesDir}`)
+      process.exit(1)
+    }
+
     // Step 4: Pack packages
     log("Packing packages...")
     const packages = fs.readdirSync(config.packagesDir)
+
+    if (packages.length === 0) {
+      error(`No packages found in: ${config.packagesDir}`)
+      process.exit(1)
+    }
 
     for (const pkg of packages) {
       const pkgDir = path.join(config.packagesDir, pkg)
       if (fs.statSync(pkgDir).isDirectory()) {
         process.chdir(pkgDir)
-        exec("pnpm pack --pack-destination ../../temp/")
+        const [_, packError] = await tryCatch(() =>
+          exec("pnpm pack --pack-destination ../../temp/")
+        )
+        if (packError) {
+          error(`Failed to pack ${pkg}`)
+          process.exit(1)
+        }
         process.chdir(config.rootDir)
       }
     }
@@ -85,10 +105,14 @@ async function main() {
       exec("pnpm release")
       success("Packages published successfully!")
     } else {
+      log("Cleaning up temporary files...")
+      fs.rmSync(config.tempDir, { recursive: true, force: true })
       success("Build and pack completed successfully!")
       log("To publish packages, run this script with the --publish flag")
     }
-  } catch (err) {
+  })
+
+  if (err) {
     error("Publishing process failed")
     process.exit(1)
   }

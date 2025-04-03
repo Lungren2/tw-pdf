@@ -1,5 +1,6 @@
 import { Style } from "@react-pdf/stylesheet"
 import { TailwindProcessor } from "./processor"
+import { tryCatch } from "@maxmorozoff/try-catch-tuple"
 
 // Create a default processor instance
 let defaultProcessor: TailwindProcessor | null = null
@@ -22,22 +23,32 @@ const getDefaultProcessor = (): TailwindProcessor => {
  */
 export const tw = async (classNames: string): Promise<Style> => {
   // Use default processor
-  return getDefaultProcessor().process(classNames)
+  const [classes, error] = await tryCatch(() =>
+    getDefaultProcessor().process(classNames)
+  )
+  if (error) {
+    console.error("Error processing Tailwind classes:", error)
+    return {}
+  }
+  return classes
 }
 
 /**
- * Synchronous version of tw function that uses a predefined set of Tailwind classes
+ * [EXPERIMENTAL] Synchronous version of tw function that uses a predefined set of Tailwind classes
  * This is useful for static class names that are known at build time
  *
+ * @experimental This function is not fully implemented yet and currently returns an empty object with a warning.
+ * It is planned to be fully implemented in a future release (targeting v0.2.0) with precompiled common Tailwind classes.
+ *
  * @param classNames - Tailwind CSS class names
- * @returns react-pdf style object
+ * @returns react-pdf style object (currently empty)
  */
 export const twSync = (classNames: string): Style => {
   // For now, this is a simple implementation that returns an empty object
   // In a real implementation, we would precompile common Tailwind classes
   // and load them from a JSON file or similar
   console.warn(
-    "twSync is not fully implemented yet. Use tw() for full Tailwind support."
+    "[EXPERIMENTAL] twSync is not fully implemented yet and returns an empty object. Use tw() for full Tailwind support."
   )
   return {}
 }

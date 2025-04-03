@@ -1,12 +1,12 @@
 {
   "name": "tw-pdf",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "A fork of react-pdf with Tailwind CSS integration",
   "author": "Ethan Ogle <ethanogle012@outlook.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Lungren2/tw-pdf.git"
+    "url": "https://github.com/Lungren2/tw-pdf.git"
   },
   "homepage": "https://github.com/Lungren2/tw-pdf#readme",
   "bugs": {

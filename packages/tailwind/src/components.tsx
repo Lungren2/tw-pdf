@@ -72,6 +72,8 @@ export const Tailwind: FC<TailwindProps> = ({ className, style, children }) => {
 
     // Clone with the new style
     // Use type assertion to handle the style prop
+    // Using type assertion because React.cloneElement's typing doesn't fully support
+    // the complex style types that react-pdf components may have
     return React.cloneElement(child, { style: newStyle } as any)
   })
 }

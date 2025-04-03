@@ -1,5 +1,4 @@
 import { dts } from 'rollup-plugin-dts';
-import del from 'rollup-plugin-delete';
 import typescript from '@rollup/plugin-typescript';
 import localResolve from 'rollup-plugin-local-resolve';
 

@@ -58,11 +58,15 @@ async function main() {
 
     // Step 2: Build packages
     log("Building packages...")
-    exec("pnpm build")
+    exec("pnpm build", { stdio: "inherit" })
 
     // Step 3: Run tests
     log("Running tests...")
-    exec("pnpm test")
+    exec("pnpm test", { stdio: "inherit" })
+
+    // Step 4: Run typechecking
+    log("Running typechecking...")
+    exec("pnpm typecheck", { stdio: "inherit" })
 
     // Validate packages directory
     if (!fs.existsSync(config.packagesDir)) {
@@ -84,7 +88,7 @@ async function main() {
       if (fs.statSync(pkgDir).isDirectory()) {
         process.chdir(pkgDir)
         const [_, packError] = await tryCatch(() =>
-          exec("pnpm pack --pack-destination ../../temp/")
+          exec("pnpm pack --pack-destination ../../temp/", { stdio: "inherit" })
         )
         if (packError) {
           error(`Failed to pack ${pkg}`)

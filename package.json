@@ -23,6 +23,7 @@
     "build": "pnpm -r build",
     "watch": "pnpm -r --parallel watch",
     "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean && rimraf node_modules",
     "release": "pnpm publish -r",
@@ -30,6 +31,7 @@
     "publish-all": "node publish.js --publish"
   },
   "devDependencies": {
+    "@maxmorozoff/try-catch-tuple": "^0.1.2",
     "lerna": "^7.4.2",
     "rimraf": "^5.0.5"
   },

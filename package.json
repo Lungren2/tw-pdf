@@ -1,12 +1,12 @@
 {
   "name": "tw-pdf",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "A fork of react-pdf with Tailwind CSS integration",
   "author": "Ethan Ogle <ethanogle012@outlook.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Lungren2/tw-pdf.git"
+    "url": "https://github.com/Lungren2/tw-pdf.git"
   },
   "homepage": "https://github.com/Lungren2/tw-pdf#readme",
   "bugs": {
@@ -20,20 +20,25 @@
     "react-pdf"
   ],
   "scripts": {
-    "build": "lerna run build",
-    "watch": "lerna run watch --parallel",
-    "test": "lerna run test",
-    "lint": "lerna run lint",
-    "clean": "lerna clean --yes && rimraf node_modules",
-    "release": "lerna publish"
+    "build": "pnpm -r build",
+    "watch": "pnpm -r --parallel watch",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r clean && rimraf node_modules",
+    "release": "pnpm publish -r",
+    "publish-check": "node publish.js",
+    "publish-all": "node publish.js --publish"
   },
   "devDependencies": {
+    "@maxmorozoff/try-catch-tuple": "^0.1.2",
     "lerna": "^7.4.2",
     "rimraf": "^5.0.5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
+      "esbuild",
       "nx"
     ]
   }

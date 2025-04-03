@@ -1,10 +1,12 @@
-# @react-pdf/tailwind
+# tw-pdf
 
-> Tailwind CSS integration for react-pdf
+> A fork of react-pdf with Tailwind CSS integration
 
 ## Overview
 
-This package provides integration between Tailwind CSS and react-pdf, allowing you to use Tailwind classes directly in your react-pdf components. It works by processing Tailwind classes through the Tailwind JIT compiler (which is the default in Tailwind v4) and converting them to react-pdf compatible styles.
+tw-pdf is a fork of the excellent react-pdf library that adds native Tailwind CSS support. It allows you to use Tailwind classes directly in your react-pdf components through a `className` prop, just like you would in a regular React application.
+
+This package works by processing Tailwind classes through the Tailwind Just-In-Time (JIT) compiler (which is the default in Tailwind v4) and converting them to react-pdf compatible styles. The JIT compiler analyzes your Tailwind class strings at runtime, generates the corresponding CSS, and then transforms it into react-pdf compatible style objects.
 
 The package provides two main ways to use Tailwind CSS with react-pdf:
 
@@ -14,9 +16,11 @@ The package provides two main ways to use Tailwind CSS with react-pdf:
 ## Installation
 
 ```sh
-npm install @react-pdf/tailwind
+npm install tw-pdf
 # or
-yarn add @react-pdf/tailwind
+yarn add tw-pdf
+# or
+pnpm add tw-pdf
 ```
 
 ## Usage
@@ -25,7 +29,7 @@ yarn add @react-pdf/tailwind
 
 ```jsx
 import React from 'react';
-import { Document, Page, Text, View } from '@react-pdf/tailwind';
+import { Document, Page, Text, View } from 'tw-pdf';
 
 // Create a PDF with Tailwind classes directly in className prop
 const MyDocument = () => (
@@ -48,7 +52,7 @@ If you prefer to use the standard react-pdf components, you can use the `tw()` f
 ```jsx
 import React, { useEffect, useState } from 'react';
 import { Document, Page, Text, View } from '@react-pdf/renderer';
-import { tw } from '@react-pdf/tailwind';
+import { tw } from 'tw-pdf';
 
 const MyDocument = () => {
   const [containerStyle, setContainerStyle] = useState({});
@@ -86,7 +90,7 @@ For backward compatibility, you can still use the `Tailwind` component:
 import React from 'react';
 import { Document, Page } from '@react-pdf/renderer';
 import { View, Text } from '@react-pdf/renderer';
-import { Tailwind } from '@react-pdf/tailwind';
+import { Tailwind } from 'tw-pdf';
 
 // Create a PDF with Tailwind styles using the Tailwind component
 const MyDocument = () => (
@@ -110,7 +114,7 @@ You can combine Tailwind classes with regular react-pdf styles:
 
 ```jsx
 import React from 'react';
-import { Document, Page, Text, View } from '@react-pdf/tailwind';
+import { Document, Page, Text, View } from 'tw-pdf';
 
 const MyDocument = () => (
   <Document>
@@ -133,7 +137,7 @@ const MyDocument = () => (
 You can manage the Tailwind processing cache:
 
 ```jsx
-import { TailwindProvider } from '@react-pdf/tailwind';
+import { TailwindProvider } from 'tw-pdf';
 
 // Clear the Tailwind cache if needed
 TailwindProvider.clearCache();
@@ -146,6 +150,60 @@ TailwindProvider.reset();
 
 To customize Tailwind, you can use Tailwind's built-in customization approach by creating a `tailwind.config.js` file in your project. The JIT compiler will automatically pick up these customizations.
 
+#### Configuration Requirements
+
+For optimal performance and to ensure all your styles are properly processed, make sure your `tailwind.config.js` includes the correct content paths:
+
+```js
+// tailwind.config.js
+module.exports = {
+  content: [
+    './src/**/*.{js,jsx,ts,tsx}', // Adjust these paths to match your project structure
+    './components/**/*.{js,jsx,ts,tsx}',
+    // Add any other paths where you use Tailwind classes
+  ],
+  // Your other Tailwind configurations...
+};
+```
+
+#### How the JIT Processing Works
+
+1. **Class Parsing**: When you use a `className` prop or the `tw()` function, tw-pdf extracts the Tailwind class strings
+2. **JIT Compilation**: These classes are sent to the Tailwind JIT compiler, which generates the corresponding CSS
+3. **Style Transformation**: The CSS is parsed and converted into react-pdf compatible style objects
+4. **Caching**: Results are cached for performance, so identical class strings don't need to be reprocessed
+5. **Application**: The resulting styles are applied to your react-pdf components
+
+## Development
+
+### Building the Package
+
+To build the package locally:
+
+```sh
+# Install dependencies
+npm install
+
+# Build the package
+npm run build
+```
+
+This will create the `lib` directory with the compiled JavaScript and TypeScript declaration files.
+
+### Publishing
+
+The package includes automated scripts to verify and publish:
+
+```sh
+# Verify the package (build and dry-run pack)
+npm run verify-package
+
+# Release (verify and publish)
+npm run release
+```
+
+These scripts ensure that the package is properly built and contains all necessary files before publishing.
+
 ## API
 
 ### Enhanced Components
@@ -156,7 +214,7 @@ All standard react-pdf components with added `className` support:
 import {
   Document, Page, Text, View, Image, Link,
   // ... and all other react-pdf components
-} from '@react-pdf/tailwind';
+} from 'tw-pdf';
 ```
 
 These components accept a `className` prop for Tailwind classes in addition to all standard react-pdf props.
@@ -166,7 +224,7 @@ These components accept a `className` prop for Tailwind classes in addition to a
 Higher-order component that adds `className` support to any react-pdf component.
 
 ```jsx
-import { withClassName } from '@react-pdf/tailwind';
+import { withClassName } from 'tw-pdf';
 import { MyCustomComponent } from './my-components';
 
 const MyEnhancedComponent = withClassName(MyCustomComponent);
@@ -178,9 +236,11 @@ Processes Tailwind CSS classes and returns a react-pdf style object.
 
 - `classNames`: Tailwind CSS class names (space-separated)
 
-### `twSync(classNames: string): Style`
+### `twSync(classNames: string): Style` [EXPERIMENTAL]
 
-Synchronous version of `tw()`. Currently a placeholder for future implementation.
+Synchronous version of `tw()` that is intended to use precompiled Tailwind classes for better performance.
+
+> **Note:** This function is currently experimental and returns an empty object with a console warning. It is planned to be fully implemented in a future release (targeting v0.2.0). Please use `tw()` for full Tailwind support in the meantime.
 
 ### `tailwind(classNames: string): Promise<Style>`
 
@@ -208,4 +268,8 @@ Utility similar to react-pdf's StyleSheet.
 
 ## License
 
-MIT
+MIT © [Ethan Ogle](https://github.com/Lungren2)
+
+## Acknowledgements
+
+This project is a fork of [react-pdf](https://github.com/diegomura/react-pdf) created by [Diego Muracciole](https://github.com/diegomura). All credit for the core PDF functionality goes to the original author and contributors.

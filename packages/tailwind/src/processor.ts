@@ -1,23 +1,23 @@
-import postcss from 'postcss';
-import tailwindcss from 'tailwindcss';
-import { Style } from '@react-pdf/stylesheet';
+import postcss from "postcss"
+import tailwindcss from "tailwindcss"
+import { Style } from "@react-pdf/stylesheet"
 
 /**
  * TailwindProcessor class for processing Tailwind CSS classes
  * This uses a single PostCSS processor instance for better performance
  */
 export class TailwindProcessor {
-  private processor: postcss.Processor;
-  private cache: Map<string, Style>;
+  private processor: postcss.Processor
+  private cache: Map<string, Style>
 
   /**
    * Create a new TailwindProcessor
    */
   constructor() {
-    this.cache = new Map();
+    this.cache = new Map()
     this.processor = postcss([
       tailwindcss(), // Use default Tailwind configuration
-    ]);
+    ])
   }
 
   /**
@@ -29,11 +29,11 @@ export class TailwindProcessor {
   async process(classNames: string): Promise<Style> {
     // Check cache first
     if (this.cache.has(classNames)) {
-      return this.cache.get(classNames) as Style;
+      return this.cache.get(classNames) as Style
     }
 
     // Create a temporary HTML content with the class names
-    const html = `<div class="${classNames}"></div>`;
+    const html = `<div class="${classNames}"></div>`
 
     // Process the HTML with Tailwind CSS
     // Use a basic CSS file with Tailwind directives
@@ -41,23 +41,23 @@ export class TailwindProcessor {
       @tailwind base;
       @tailwind components;
       @tailwind utilities;
-    `;
+    `
 
     const result = await this.processor.process(css, {
       from: undefined,
       to: undefined,
       map: false,
       // @ts-ignore - Tailwind specific options
-      content: [{ raw: html, extension: 'html' }],
-    });
+      content: [{ raw: html, extension: "html" }],
+    })
 
     // Parse the CSS and convert to react-pdf style
-    const style = this.parseCssToStyle(result.css, classNames);
+    const style = this.parseCssToStyle(result.css, classNames)
 
     // Cache the result
-    this.cache.set(classNames, style);
+    this.cache.set(classNames, style)
 
-    return style;
+    return style
   }
 
   /**
@@ -68,22 +68,24 @@ export class TailwindProcessor {
    * @returns react-pdf style object
    */
   private parseCssToStyle(css: string, classNames: string): Style {
-    const style: Style = {};
-    const classes = classNames.split(' ').filter(Boolean);
+    const style: Style = {}
+    const classes = classNames.split(" ").filter(Boolean)
 
     // Extract CSS rules for our classes
-    const cssRules = this.extractCssRules(css, classes);
+    const cssRules = this.extractCssRules(css, classes)
 
     // Convert CSS rules to react-pdf style
     for (const [property, value] of Object.entries(cssRules)) {
       // Convert kebab-case to camelCase
-      const camelCaseProperty = property.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      const camelCaseProperty = property.replace(/-([a-z])/g, (_, letter) =>
+        letter.toUpperCase()
+      )
 
       // Add the property to the style object
-      style[camelCaseProperty] = this.convertCssValue(value);
+      style[camelCaseProperty] = this.convertCssValue(value)
     }
 
-    return style;
+    return style
   }
 
   /**
@@ -93,36 +95,39 @@ export class TailwindProcessor {
    * @param classes - Array of class names
    * @returns CSS rules object
    */
-  private extractCssRules(css: string, classes: string[]): Record<string, string> {
-    const rules: Record<string, string> = {};
+  private extractCssRules(
+    css: string,
+    classes: string[]
+  ): Record<string, string> {
+    const rules: Record<string, string> = {}
 
     // Simple CSS parser to extract rules
-    const cssRules = css.match(/\.[\w-]+\s*{[^}]*}/g) || [];
+    const cssRules = css.match(/\.[\w-]+\s*{[^}]*}/g) || []
 
     for (const rule of cssRules) {
-      const selectorMatch = rule.match(/\.([\w-]+)\s*{/);
-      if (!selectorMatch) continue;
+      const selectorMatch = rule.match(/\.([\w-]+)\s*{/)
+      if (!selectorMatch) continue
 
-      const selector = selectorMatch[1];
+      const selector = selectorMatch[1]
 
       // Check if this selector is one of our classes
       if (classes.includes(selector)) {
-        const propertiesMatch = rule.match(/{([^}]*)}/);
-        if (!propertiesMatch) continue;
+        const propertiesMatch = rule.match(/{([^}]*)}/)
+        if (!propertiesMatch) continue
 
-        const properties = propertiesMatch[1].trim();
-        const declarations = properties.split(';').filter(Boolean);
+        const properties = propertiesMatch[1].trim()
+        const declarations = properties.split(";").filter(Boolean)
 
         for (const declaration of declarations) {
-          const [property, value] = declaration.split(':').map(s => s.trim());
+          const [property, value] = declaration.split(":").map((s) => s.trim())
           if (property && value) {
-            rules[property] = value;
+            rules[property] = value
           }
         }
       }
     }
 
-    return rules;
+    return rules
   }
 
   /**
@@ -135,22 +140,22 @@ export class TailwindProcessor {
     // Convert numeric values with units
     if (/^-?\d+(\.\d+)?(px|pt|rem|em|vh|vw|%)$/.test(value)) {
       // Keep the unit for react-pdf
-      return value;
+      return value
     }
 
     // Convert numeric values without units
     if (/^-?\d+(\.\d+)?$/.test(value)) {
-      return parseFloat(value);
+      return parseFloat(value)
     }
 
     // Handle colors, strings, etc.
-    return value;
+    return value
   }
 
   /**
    * Clear the cache
    */
   clearCache(): void {
-    this.cache.clear();
+    this.cache.clear()
   }
 }

@@ -1,0 +1,11 @@
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+code {
+  background-color: #f1f1f1;
+  padding: 0.1em 0.3em;
+  border-radius: 0.2em;
+  font-size: 0.9em;
+}

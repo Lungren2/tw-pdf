@@ -6,7 +6,7 @@
 
 tw-pdf is a fork of the excellent react-pdf library that adds native Tailwind CSS support. It allows you to use Tailwind classes directly in your react-pdf components through a `className` prop, just like you would in a regular React application.
 
-This package works by processing Tailwind classes through the Tailwind Just-In-Time (JIT) compiler (which is the default in Tailwind v4) and converting them to react-pdf compatible styles. The JIT compiler analyzes your Tailwind class strings at runtime, generates the corresponding CSS, and then transforms it into react-pdf compatible style objects.
+This package works by pre-processing Tailwind classes and converting them to react-pdf compatible styles. It leverages Tailwind's existing infrastructure to generate optimized styles that are then used by your react-pdf components. Unlike other approaches, tw-pdf doesn't run the Tailwind processor in the browser, resulting in better performance and smaller bundle sizes.
 
 The package provides two main ways to use Tailwind CSS with react-pdf:
 
@@ -16,11 +16,31 @@ The package provides two main ways to use Tailwind CSS with react-pdf:
 ## Installation
 
 ```sh
-npm install tw-pdf
+npm install tw-pdf tailwindcss
 # or
-yarn add tw-pdf
+yarn add tw-pdf tailwindcss
 # or
-pnpm add tw-pdf
+pnpm add tw-pdf tailwindcss
+```
+
+## Setup
+
+After installing tw-pdf, you can start using it immediately. No additional setup is required!
+
+```jsx
+import { Document, Page, Text, View } from 'tw-pdf';
+
+const MyDocument = () => (
+  <Document>
+    <Page>
+      <View className="flex flex-col items-center p-10 bg-blue-100">
+        <Text className="text-2xl font-bold text-blue-600">
+          Hello, Tailwind CSS!
+        </Text>
+      </View>
+    </Page>
+  </Document>
+);
 ```
 
 ## Usage
@@ -50,23 +70,14 @@ const MyDocument = () => (
 If you prefer to use the standard react-pdf components, you can use the `tw()` function:
 
 ```jsx
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Document, Page, Text, View } from '@react-pdf/renderer';
 import { tw } from 'tw-pdf';
 
 const MyDocument = () => {
-  const [containerStyle, setContainerStyle] = useState({});
-  const [textStyle, setTextStyle] = useState({});
-
-  useEffect(() => {
-    // Process Tailwind classes
-    const loadStyles = async () => {
-      setContainerStyle(await tw('flex flex-col items-center p-10 bg-blue-100'));
-      setTextStyle(await tw('text-2xl font-bold text-blue-600'));
-    };
-
-    loadStyles();
-  }, []);
+  // Process Tailwind classes (now synchronous)
+  const containerStyle = tw('flex flex-col items-center p-10 bg-blue-100');
+  const textStyle = tw('text-2xl font-bold text-blue-600');
 
   return (
     <Document>
@@ -132,23 +143,52 @@ const MyDocument = () => (
 );
 ```
 
-### Managing the Tailwind Cache
+### Supported Tailwind Classes
 
-You can manage the Tailwind processing cache:
+tw-pdf includes support for many common Tailwind classes, including:
+
+- Layout: `flex`, `flex-row`, `grid`, `container`, etc.
+- Spacing: `p-4`, `m-2`, `px-4`, etc.
+- Typography: `text-lg`, `font-bold`, `text-center`, etc.
+- Colors: `text-blue-500`, `bg-red-100`, etc.
+- Borders: `border`, `rounded-lg`, etc.
+- Effects: `shadow-md`, etc.
+
+If you need to use a class that isn't supported, you can always use the regular style prop alongside className.
+
+### React-PDF CSS Support Notes
+
+When using tw-pdf, it's important to understand some key differences in how CSS works in react-pdf:
+
+- react-pdf supports most CSS properties that make sense in a PDF context (see [valid CSS properties](https://react-pdf.org/styling#valid-css-properties))
+- Default font family classes are excluded, since you have to include your own fonts anyway
+- react-pdf internally uses pt as the default unit, with 1rem = 12pt by default (this can be changed in the options)
+- Since react-pdf uses Yoga internally, some defaults differ from web standards (for example, flex-direction defaults to column, which can be fixed by adding the flex-row class where needed)
+- Modifiers like breakpoints aren't currently supported
+
+### Unit Conversion
+
+tw-pdf automatically handles unit conversion for react-pdf:
+
+- `rem` units are converted to `pt` (1rem = 12pt by default in react-pdf)
+- `px` units are converted to `pt` (1px ≈ 0.75pt)
+- Percentage, vh, vw, and other relative units are preserved as-is
+- Numeric values without units are preserved as-is
+
+### Combining with Regular Styles
+
+You can combine Tailwind classes with regular react-pdf styles:
 
 ```jsx
-import { TailwindProvider } from 'tw-pdf';
-
-// Clear the Tailwind cache if needed
-TailwindProvider.clearCache();
-
-// Reset the Tailwind processor
-TailwindProvider.reset();
+<View
+  className="p-4 bg-blue-100 rounded"
+  style={{ borderWidth: 1, borderColor: 'blue' }}
+>
+  <Text>Combined styles</Text>
+</View>
 ```
 
-### Customizing Tailwind
-
-To customize Tailwind, you can use Tailwind's built-in customization approach by creating a `tailwind.config.js` file in your project. The JIT compiler will automatically pick up these customizations.
+The style prop takes precedence over className styles when there are conflicts.
 
 #### Configuration Requirements
 
@@ -166,13 +206,20 @@ module.exports = {
 };
 ```
 
-#### How the JIT Processing Works
+#### How the Processing Works
 
-1. **Class Parsing**: When you use a `className` prop or the `tw()` function, tw-pdf extracts the Tailwind class strings
-2. **JIT Compilation**: These classes are sent to the Tailwind JIT compiler, which generates the corresponding CSS
-3. **Style Transformation**: The CSS is parsed and converted into react-pdf compatible style objects
-4. **Caching**: Results are cached for performance, so identical class strings don't need to be reprocessed
+1. **Style Pre-Processing**: tw-pdf includes a set of pre-processed Tailwind styles
+2. **Class Parsing**: When you use a `className` prop or the `tw()` function, tw-pdf extracts the Tailwind class strings
+3. **Style Lookup**: These classes are used to look up the pre-processed styles
+4. **Style Merging**: The styles are merged with any explicitly provided style props
 5. **Application**: The resulting styles are applied to your react-pdf components
+
+#### Key Benefits
+
+- **Performance**: No runtime processing of Tailwind classes in the browser
+- **Simplicity**: No complex setup or build configuration required
+- **Compatibility**: Works with any React project, not just specific build tools
+- **Developer Experience**: Familiar API with className props
 
 ## Development
 
@@ -230,19 +277,17 @@ import { MyCustomComponent } from './my-components';
 const MyEnhancedComponent = withClassName(MyCustomComponent);
 ```
 
-### `tw(classNames: string): Promise<Style>`
+### `tw(classNames: string): Style`
 
 Processes Tailwind CSS classes and returns a react-pdf style object.
 
 - `classNames`: Tailwind CSS class names (space-separated)
 
-### `twSync(classNames: string): Style` [EXPERIMENTAL]
+### `twSync(classNames: string): Style`
 
-Synchronous version of `tw()` that is intended to use precompiled Tailwind classes for better performance.
+Alias for `tw()` function.
 
-> **Note:** This function is currently experimental and returns an empty object with a console warning. It is planned to be fully implemented in a future release (targeting v0.2.0). Please use `tw()` for full Tailwind support in the meantime.
-
-### `tailwind(classNames: string): Promise<Style>`
+### `tailwind(classNames: string): Style`
 
 Alias for `tw()`.
 
@@ -255,10 +300,10 @@ Component that processes Tailwind classes and applies them to its children.
 
 ### `TailwindProvider`
 
-Utility for managing Tailwind processing.
+Legacy utility for backward compatibility. These methods don't do anything in the current implementation.
 
-- `TailwindProvider.reset()`: Reset the Tailwind processor
-- `TailwindProvider.clearCache()`: Clear the Tailwind cache
+- `TailwindProvider.reset()`: No-op function for backward compatibility
+- `TailwindProvider.clearCache()`: No-op function for backward compatibility
 
 ### `StyleSheet`
 

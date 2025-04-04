@@ -1,0 +1,95 @@
+{
+  "m-4": {
+    "margin": "1rem"
+  },
+  "mx-auto": {
+    "marginLeft": "auto",
+    "marginRight": "auto"
+  },
+  "my-4": {
+    "marginTop": "1rem",
+    "marginBottom": "1rem"
+  },
+  "flex": {
+    "display": "flex"
+  },
+  "grid": {
+    "display": "grid"
+  },
+  "h-10": {
+    "height": "2.5rem"
+  },
+  "w-full": {
+    "width": "100%"
+  },
+  "max-w-md": {
+    "maxWidth": "28rem"
+  },
+  "grid-cols-2": {
+    "gridTemplateColumns": "repeat(2,minmax(0,1fr))"
+  },
+  "flex-col": {
+    "flexDirection": "column"
+  },
+  "items-center": {
+    "alignItems": "center"
+  },
+  "justify-center": {
+    "justifyContent": "center"
+  },
+  "gap-4": {
+    "gap": "1rem"
+  },
+  "rounded-lg": {
+    "borderRadius": ".5rem"
+  },
+  "border": {
+    "borderWidth": "1px"
+  },
+  "border-blue-200": {
+    "-TwBorderOpacity": 1,
+    "borderColor": "rgb(191 219 254/var(--tw-border-opacity,1))"
+  },
+  "bg-blue-100": {
+    "-TwBgOpacity": 1,
+    "backgroundColor": "rgb(219 234 254/var(--tw-bg-opacity,1))"
+  },
+  "bg-gray-100": {
+    "-TwBgOpacity": 1,
+    "backgroundColor": "rgb(243 244 246/var(--tw-bg-opacity,1))"
+  },
+  "bg-red-500": {
+    "-TwBgOpacity": 1,
+    "backgroundColor": "rgb(239 68 68/var(--tw-bg-opacity,1))"
+  },
+  "p-4": {
+    "padding": "1rem"
+  },
+  "p-6": {
+    "padding": "1.5rem"
+  },
+  "text-lg": {
+    "fontSize": "1.125rem",
+    "lineHeight": "1.75rem"
+  },
+  "font-bold": {
+    "fontWeight": 700
+  },
+  "text-blue-800": {
+    "-TwTextOpacity": 1,
+    "color": "rgb(30 64 175/var(--tw-text-opacity,1))"
+  },
+  "text-gray-800": {
+    "-TwTextOpacity": 1,
+    "color": "rgb(31 41 55/var(--tw-text-opacity,1))"
+  },
+  "text-white": {
+    "-TwTextOpacity": 1,
+    "color": "rgb(255 255 255/var(--tw-text-opacity,1))"
+  },
+  "shadow-md": {
+    "-TwShadow": "0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1)",
+    "-TwShadowColored": "0 4px 6px -1px var(--tw-shadow-color),0 2px 4px -2px var(--tw-shadow-color)",
+    "boxShadow": "var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)"
+  }
+}

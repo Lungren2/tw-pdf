@@ -1,4 +1,4 @@
-import React, { ComponentType, forwardRef, useEffect, useState } from "react"
+import React, { ComponentType, forwardRef } from "react"
 import { Style } from "@react-pdf/stylesheet"
 import { tw } from "./tw"
 
@@ -20,29 +20,24 @@ export const withClassName = <P extends object>(
   // Create a new component with className support
   const WithClassName = forwardRef<unknown, P & ClassNameProps>(
     ({ className, style, ...props }, ref) => {
-      const [processedStyle, setProcessedStyle] = useState<
-        Style | Style[] | undefined
-      >(style)
+      // Process className and style
+      let processedStyle: Style | Style[] | undefined = style
 
-      useEffect(() => {
-        if (className) {
-          // Process Tailwind classes
-          tw(className).then((tailwindStyle) => {
-            if (style) {
-              // Merge with any provided style prop (style prop takes precedence)
-              if (Array.isArray(style)) {
-                setProcessedStyle([tailwindStyle, ...style])
-              } else {
-                setProcessedStyle([tailwindStyle, style])
-              }
-            } else {
-              setProcessedStyle(tailwindStyle)
-            }
-          })
+      if (className) {
+        // Process Tailwind classes (now synchronous)
+        const tailwindStyle = tw(className)
+
+        if (style) {
+          // Merge with any provided style prop (style prop takes precedence)
+          if (Array.isArray(style)) {
+            processedStyle = [tailwindStyle, ...style]
+          } else {
+            processedStyle = [tailwindStyle, style]
+          }
         } else {
-          setProcessedStyle(style)
+          processedStyle = tailwindStyle
         }
-      }, [className, style])
+      }
 
       // @ts-ignore - Spread props may not be valid
       return <Component ref={ref} {...props} style={processedStyle} />

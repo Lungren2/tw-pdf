@@ -30,6 +30,7 @@ import {
 
 import { default as withClassName } from "./withClassName"
 import { tw, twSync, tailwind, TailwindProvider, StyleSheet } from "./tw"
+import { cssToStyles } from "./cssToStyles"
 
 // Export enhanced components with className support
 export {
@@ -67,6 +68,9 @@ export { default as withClassName } from "./withClassName"
 // Export Tailwind utilities
 export { tw, twSync, tailwind, StyleSheet, TailwindProvider } from "./tw"
 
+// Export CSS utilities
+export { cssToStyles } from "./cssToStyles"
+
 // Create a convenience object with all exports
 const TailwindPDF = {
   tw,
@@ -74,6 +78,7 @@ const TailwindPDF = {
   tailwind,
   StyleSheet,
   TailwindProvider,
+  cssToStyles,
   Tailwind,
   View,
   Text,

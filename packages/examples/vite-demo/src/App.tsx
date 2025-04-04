@@ -55,11 +55,8 @@ function App() {
             <li>
               Use Tailwind classes with the <code>className</code> prop
             </li>
-            <li>
-              The library processes the classes through the Tailwind JIT
-              compiler
-            </li>
-            <li>The resulting styles are applied to your PDF components</li>
+            <li>The library uses pre-processed Tailwind styles</li>
+            <li>The styles are applied to your PDF components</li>
           </ol>
         </div>
       </div>

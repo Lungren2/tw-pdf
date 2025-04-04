@@ -12,21 +12,14 @@
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "strict": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "types": [
       "vitest/globals",
-      "react"
-    ],
-    "plugins": [
-      {
-        "name": "@maxmorozoff/try-catch-tuple-ts-plugin",
-        "transform": "@maxmorozoff/try-catch-tuple-ts-plugin/transformer",
-        "errorLevel": "error",
-        "allowIgnoredError": true,
-        "checkWrappedCalls": true
-      }
+      "react",
+      "node"
     ],
     "jsx": "react",
     "jsxFactory": "React.createElement",

@@ -1,64 +1,102 @@
 import { Style } from "@react-pdf/stylesheet"
-import { TailwindProcessor } from "./processor"
 import { tryCatch } from "@maxmorozoff/try-catch-tuple"
+import { loadStyles } from "./styleCache"
 
-// Create a default processor instance
-let defaultProcessor: TailwindProcessor | null = null
+// Helper function to process styles and convert units
+const processStyles = (
+  styles: Record<string, Style>
+): Record<string, Style> => {
+  const processed: Record<string, Style> = {}
 
-/**
- * Get or create the default Tailwind processor
- */
-const getDefaultProcessor = (): TailwindProcessor => {
-  if (!defaultProcessor) {
-    defaultProcessor = new TailwindProcessor()
+  // Process each style
+  for (const [className, style] of Object.entries(styles)) {
+    const processedStyle: Style = {}
+
+    // Process each property
+    for (const [prop, value] of Object.entries(style)) {
+      // Convert string values that might be units
+      if (
+        typeof value === "string" &&
+        /^-?\d+(\.\d+)?(rem|px|pt|em|%)$/.test(value)
+      ) {
+        // Handle rem units (1rem = 12pt in react-pdf by default)
+        if (value.endsWith("rem")) {
+          const remValue = parseFloat(value.replace("rem", ""))
+          processedStyle[prop] = `${remValue * 12}pt`
+        }
+        // Handle px units (convert to pt for react-pdf)
+        else if (value.endsWith("px")) {
+          const pxValue = parseFloat(value.replace("px", ""))
+          // Approximate conversion: 1px ≈ 0.75pt
+          processedStyle[prop] = `${pxValue * 0.75}pt`
+        }
+        // Keep other units as is
+        else {
+          processedStyle[prop] = value
+        }
+      } else {
+        // Keep non-unit values as is
+        processedStyle[prop] = value
+      }
+    }
+
+    processed[className] = processedStyle
   }
-  return defaultProcessor
+
+  return processed
 }
+
+// Load styles based on environment and process them for react-pdf
+const rawStyles = loadStyles(process.env.NODE_ENV === "production")
+const styles = processStyles(rawStyles)
 
 /**
  * Process Tailwind CSS classes and convert them to react-pdf style object
+ * This is now a synchronous function that uses pre-generated styles
  *
  * @param classNames - Tailwind CSS class names
- * @returns Promise resolving to react-pdf style object
+ * @returns react-pdf style object
  */
-export const tw = async (classNames: string): Promise<Style> => {
-  // Use default processor
-  const [classes, error] = await tryCatch(() =>
-    getDefaultProcessor().process(classNames)
-  )
+export const tw = (classNames: string): Style => {
+  // Use try-catch-tuple pattern for error handling
+  const [result, error] = tryCatch(() => {
+    // Split class names
+    const classes = classNames.split(" ").filter(Boolean)
+
+    // Create a style object from the classes
+    const tailwindStyle: Style = {}
+
+    // Look up styles for each class
+    for (const cls of classes) {
+      if (styles[cls]) {
+        Object.assign(tailwindStyle, styles[cls])
+      }
+    }
+
+    return tailwindStyle
+  })
+
   if (error) {
-    console.error("Error processing Tailwind classes:", error)
+    console.warn("Error processing Tailwind classes:", error)
     return {}
   }
-  return classes
+
+  return result
 }
 
 /**
- * [EXPERIMENTAL] Synchronous version of tw function that uses a predefined set of Tailwind classes
- * This is useful for static class names that are known at build time
- *
- * @experimental This function is not fully implemented yet and currently returns an empty object with a warning.
- * It is planned to be fully implemented in a future release (targeting v0.2.0) with precompiled common Tailwind classes.
+ * Alias for tw function
  *
  * @param classNames - Tailwind CSS class names
- * @returns react-pdf style object (currently empty)
+ * @returns react-pdf style object
  */
-export const twSync = (classNames: string): Style => {
-  // For now, this is a simple implementation that returns an empty object
-  // In a real implementation, we would precompile common Tailwind classes
-  // and load them from a JSON file or similar
-  console.warn(
-    "[EXPERIMENTAL] twSync is not fully implemented yet and returns an empty object. Use tw() for full Tailwind support."
-  )
-  return {}
-}
+export const twSync = tw
 
 /**
- * Convert Tailwind classes to react-pdf style object
- * This is a convenience function that returns a Promise
+ * Alias for tw function
  *
  * @param classNames - Tailwind CSS class names
- * @returns Promise resolving to react-pdf style object
+ * @returns react-pdf style object
  */
 export const tailwind = tw
 
@@ -70,22 +108,23 @@ export const StyleSheet = {
 }
 
 /**
- * TailwindProvider for managing Tailwind processing
+ * TailwindProvider for managing Tailwind styles
+ * This is now just a placeholder for backward compatibility
  */
 export const TailwindProvider = {
   /**
-   * Reset the Tailwind processor
+   * This function no longer does anything
+   * Styles are now loaded from the cache
    */
   reset: (): void => {
-    defaultProcessor = new TailwindProcessor()
+    // No-op
   },
 
   /**
-   * Clear the Tailwind cache
+   * This function no longer does anything
+   * Styles are now loaded from the cache
    */
   clearCache: (): void => {
-    if (defaultProcessor) {
-      defaultProcessor.clearCache()
-    }
+    // No-op
   },
 }

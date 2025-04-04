@@ -1,4 +1,3 @@
-import React from "react"
 import { Document, Page, Text, View, StyleSheet } from "tw-pdf"
 
 // Create styles with react-pdf's StyleSheet

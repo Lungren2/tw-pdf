@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useEffect, useState } from "react"
+import React, { FC, ReactNode } from "react"
 import { Style } from "@react-pdf/stylesheet"
 import {
   View as PDFView,
@@ -42,20 +42,11 @@ export interface TailwindProps {
  * This component processes Tailwind classes and applies them to its children
  */
 export const Tailwind: FC<TailwindProps> = ({ className, style, children }) => {
-  const [processedStyle, setProcessedStyle] = useState<Style>(style || {})
-
-  useEffect(() => {
-    if (className) {
-      // Process Tailwind classes
-      tw(className).then((tailwindStyle) => {
-        // Merge with any provided style prop (style prop takes precedence)
-        setProcessedStyle({
-          ...tailwindStyle,
-          ...style,
-        })
-      })
-    }
-  }, [className, style])
+  // Process Tailwind classes (now synchronous)
+  const processedStyle: Style = {
+    ...(className ? tw(className) : {}),
+    ...(style || {}),
+  }
 
   // Clone the child element and apply the processed style
   return React.Children.map(children, (child) => {
